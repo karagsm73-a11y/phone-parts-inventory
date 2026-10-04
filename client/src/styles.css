@@ -51,7 +51,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .bottomnav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer; min-width: 56px; }
 .bottomnav button.active { color: var(--accent); }
 .bottomnav button.navsearch { overflow: visible; color: var(--accent); gap: 2px; }
-.bottomnav .navsearch-btn { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; margin-top: -26px; border-radius: 50%; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 8px 24px rgba(34, 211, 238, 0.35), 0 0 0 5px var(--bg, rgba(0,0,0,0.35)); transition: transform 0.15s ease; }
+.bottomnav .navsearch-btn { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; margin-top: -26px; border-radius: 50%; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 8px 24px rgba(34, 211, 238, 0.35), 0 0 0 5px var(--bg1); transition: transform 0.15s ease; }
 .bottomnav button.navsearch:active .navsearch-btn { transform: scale(0.94); }
 .more-sheet { position: fixed; left: 10px; right: 10px; bottom: calc(var(--nav-h) + 10px); z-index: 41; padding: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .more-sheet button { display: flex; flex-direction: column; gap: 6px; align-items: center; padding: 14px 6px; border-radius: 14px; border: 1px solid transparent; background: var(--glass); color: var(--text); cursor: pointer; font-size: 12px; }
