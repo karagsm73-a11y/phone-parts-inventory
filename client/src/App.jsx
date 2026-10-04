@@ -87,7 +87,10 @@ function Shell({ onLogout }) {
       <Page key={page} nav={nav} param={pageParam} />
     </main>
     <nav className="glass bottomnav">
-      {MOBILE_MAIN.map(id => { const p = PAGES.find(x => x.id === id); return <button key={id} className={page === id ? 'active' : ''} onClick={() => go(id)}><p.icon size={22} /><span>{t(id)}</span></button>; })}
+      {MOBILE_MAIN.map((id, i) => { const p = PAGES.find(x => x.id === id); return <React.Fragment key={id}>
+        {i === Math.ceil(MOBILE_MAIN.length / 2) && <button className="navsearch" aria-label={t('search')} onClick={() => { setMore(false); setSearchOpen(true); }}><span className="navsearch-btn"><Search size={26} /></span><span>{t('search')}</span></button>}
+        <button className={page === id ? 'active' : ''} onClick={() => go(id)}><p.icon size={22} /><span>{t(id)}</span></button>
+      </React.Fragment>; })}
       <button className={!MOBILE_MAIN.includes(page) ? 'active' : ''} onClick={() => setMore(m => !m)}><MoreHorizontal size={22} /><span>{t('more')}</span></button>
     </nav>
     {more && <div className="glass more-sheet">
