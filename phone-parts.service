@@ -1,0 +1,17 @@
+[Unit]
+Description=Phone Parts Inventory
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=promptql
+WorkingDirectory=/workspace/phone-parts/server
+Environment=PORT=8080
+Environment=NODE_ENV=production
+ExecStart=/usr/local/bin/node src/index.js
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
