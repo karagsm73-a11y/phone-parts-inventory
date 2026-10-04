@@ -13,7 +13,10 @@ export default function Inventory({ nav, param }) {
   // Opened from quick search: go straight to the Use-part dialog (or details when out of stock)
   useEffect(() => {
     if (!param?.productId) return;
-    if (param.action === 'use') { setDetailId(null); get(`/products/${param.productId}`).then(d => setModal(d.product.quantity > 0 ? { type: 'use', product: d.product } : null) || (d.product.quantity > 0 ? null : setDetailId(param.productId))).catch(() => setDetailId(param.productId)); }
+    if (param.action === 'use') {
+      setDetailId(null);
+      get(`/products/${param.productId}`).then(d => { if (d.product.quantity > 0) setModal({ type: 'use', product: d.product }); else setDetailId(param.productId); }).catch(() => setDetailId(param.productId));
+    }
     else setDetailId(param.productId);
   }, [param?.productId, param?.action, param?.ts]);
   const refs = async () => { const [c, s] = await Promise.all([get('/categories'), get('/suppliers')]); setCats(c.items); setSups(s.items); };
