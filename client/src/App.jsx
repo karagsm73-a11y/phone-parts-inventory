@@ -29,7 +29,7 @@ const PAGES = [
   { id: 'audit', icon: ScrollText, el: Audit },
   { id: 'settings', icon: SettingsIcon, el: Settings },
 ];
-const MOBILE_MAIN = ['dashboard', 'inventory', 'caisse', 'debts'];
+const MOBILE_MAIN = ['dashboard', 'inventory', 'caisse'];
 
 export default function App() {
   const [lang, setLangState] = useState(localStorage.getItem('pp_lang') || 'en');
@@ -97,6 +97,6 @@ function Shell({ onLogout }) {
       {PAGES.filter(p => !MOBILE_MAIN.includes(p.id)).map(p => <button key={p.id} onClick={() => go(p.id)}><p.icon size={22} /><span>{t(p.id)}</span></button>)}
       <button onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setMore(false); }}>{theme === 'dark' ? <Sun size={22} /> : <Moon size={22} />}<span>{theme === 'dark' ? t('light') : t('dark')}</span></button>
     </div>}
-    {searchOpen && <GlobalSearch onClose={() => setSearchOpen(false)} onPick={(p) => { setSearchOpen(false); go('inventory', { productId: p.id }); }} />}
+    {searchOpen && <GlobalSearch onClose={() => setSearchOpen(false)} onPick={(p) => { setSearchOpen(false); go('inventory', { productId: p.id, action: p.quantity > 0 ? 'use' : 'detail', ts: Date.now() }); }} />}
   </div>;
 }

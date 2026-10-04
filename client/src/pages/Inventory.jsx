@@ -9,7 +9,13 @@ export default function Inventory({ nav, param }) {
   const [q, setQ] = useState(''); const [stock, setStock] = useState(''); const [cat, setCat] = useState(''); const [deleted, setDeleted] = useState(false);
   const [cats, setCats] = useState([]); const [sups, setSups] = useState([]);
   const [modal, setModal] = useState(null); // {type, product}
-  const [detailId, setDetailId] = useState(param?.productId || null);
+  const [detailId, setDetailId] = useState(param?.action === 'use' ? null : (param?.productId || null));
+  // Opened from quick search: go straight to the Use-part dialog (or details when out of stock)
+  useEffect(() => {
+    if (!param?.productId) return;
+    if (param.action === 'use') { setDetailId(null); get(`/products/${param.productId}`).then(d => setModal(d.product.quantity > 0 ? { type: 'use', product: d.product } : null) || (d.product.quantity > 0 ? null : setDetailId(param.productId))).catch(() => setDetailId(param.productId)); }
+    else setDetailId(param.productId);
+  }, [param?.productId, param?.action, param?.ts]);
   const refs = async () => { const [c, s] = await Promise.all([get('/categories'), get('/suppliers')]); setCats(c.items); setSups(s.items); };
   useEffect(() => { refs(); }, []);
   const paged = usePaged('/products', { q, stock, category: cat, deleted: deleted ? '1' : '' }, [q, stock, cat, deleted]);
