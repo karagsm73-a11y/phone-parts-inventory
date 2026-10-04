@@ -12,10 +12,11 @@ router.post('/login', asyncH(async (req, res) => {
   const ok = u && await bcrypt.compare(password, u.password_hash);
   if (!ok) { await new Promise(r => setTimeout(r, 400)); throw db.err(401, 'BAD_CREDENTIALS', 'Invalid username or password'); }
   req.session.uid = u.id; req.session.at = Date.now();
+  token.rememberVisitor(req, u.id);
   res.json({ ok: true, token: token.issue(u.id), user: { id: u.id, username: u.username } });
 }));
 
-router.post('/logout', (req, res) => { req.session = null; res.json({ ok: true }); });
+router.post('/logout', (req, res) => { token.forgetVisitor(req); req.session = null; res.json({ ok: true }); });
 
 router.post('/password', asyncH(async (req, res) => {
   if (!req.user || !req.user.uid) throw db.err(401, 'UNAUTHENTICATED');

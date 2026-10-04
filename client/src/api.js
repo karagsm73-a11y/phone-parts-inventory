@@ -8,12 +8,18 @@ export const onNetwork = (fn) => { listeners.add(fn); return () => listeners.del
 const emit = (ok) => listeners.forEach(fn => fn(ok));
 
 export const TOKEN_KEY = 'pp_token';
-export const getToken = () => { try { return localStorage.getItem(TOKEN_KEY); } catch { return null; } };
-export const setToken = (t) => { try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch {} };
+let memToken = null; // in-memory copy: works even when the browser blocks storage (sandboxed iframe)
+const stores = () => ['localStorage', 'sessionStorage'].map(k => { try { return window[k]; } catch { return null; } }).filter(Boolean);
+export const getToken = () => {
+  if (memToken) return memToken;
+  for (const s of stores()) { try { const v = s.getItem(TOKEN_KEY); if (v) { memToken = v; return v; } } catch {} }
+  return null;
+};
+export const setToken = (t) => { memToken = t || null; for (const s of stores()) { try { t ? s.setItem(TOKEN_KEY, t) : s.removeItem(TOKEN_KEY); } catch {} } };
 
 export async function api(method, path, body, opts = {}) {
   const init = { method, headers: {}, credentials: 'same-origin' };
-  const tok = getToken(); if (tok) init.headers['Authorization'] = 'Bearer ' + tok;
+  const tok = getToken(); if (tok) init.headers['X-Auth-Token'] = tok; // custom header: proxies may strip/consume Authorization
   if (body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(body); }
   let res;
   try { res = await fetch('/api' + path, init); }

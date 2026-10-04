@@ -15,13 +15,20 @@ let ready = false;
 app.get('/readyz', (req, res) => res.status(ready ? 204 : 503).end());
 
 app.use(express.json({ limit: '2mb' }));
-app.use(cookieSession({ name: 'pp_sess', keys: [cfg.sessionSecret], maxAge: 365 * 24 * 3600 * 1000, httpOnly: true, sameSite: 'lax', signed: true }));
+const sessOpts = { name: 'pp_sess', keys: [cfg.sessionSecret], maxAge: 365 * 24 * 3600 * 1000, httpOnly: true, signed: true };
+const laxSess = cookieSession({ ...sessOpts, sameSite: 'lax' });
+const noneSess = cookieSession({ ...sessOpts, sameSite: 'none', secure: true }); // iframe-safe when served over HTTPS (behind proxy)
+app.use((req, res, next) => (req.secure ? noneSess : laxSess)(req, res, next));
 app.use(token.identify);
+app.use('/api', (req, res, next) => {
+  res.on('finish', () => console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} auth=${req.authVia || '-'} hdr=${req.headers['x-auth-token'] ? 'x-auth' : req.headers.authorization ? 'bearer' : '-'} visitor=${req.visitorSub ? 'yes' : 'no'}`));
+  next();
+});
 app.use((req, res, next) => { if (req.path.startsWith('/api')) res.setHeader('Cache-Control', 'no-store'); next(); });
 
 app.get('/api/status', (req, res) => {
   const c = db.getConfig();
-  res.json({ setupComplete: !!c.setupComplete, hasSavedConnection: !!c.db, authenticated: !!(c.setupComplete && req.user && req.user.uid) });
+  res.json({ setupComplete: !!c.setupComplete, hasSavedConnection: !!c.db, authenticated: !!(c.setupComplete && req.user && req.user.uid), via: req.authVia || null });
 });
 app.use('/api/setup', require('./routes/setup'));
 
